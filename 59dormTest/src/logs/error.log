@@ -1,0 +1,18 @@
+2016-09-08 15:54:18  [ main:0 ] - [ ERROR ] - [ sql.SQLConnect.<clinit>(SQLConnect.java:66) ] 加载驱动错误com.microsoft.sqlserver.jdbc.SQLServerDriver
+java.lang.ClassNotFoundException: com.microsoft.sqlserver.jdbc.SQLServerDriver
+	at java.net.URLClassLoader.findClass(URLClassLoader.java:381)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:331)
+	at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Class.java:264)
+	at sql.SQLConnect.<clinit>(SQLConnect.java:64)
+	at com.dorm.test.SQLConnectTest.main(SQLConnectTest.java:112)
+2016-09-08 15:54:18  [ main:49 ] - [ ERROR ] - [ sql.SQLConnect.getConnection(SQLConnect.java:80) ] No suitable driver found for jdbc:sqlserver://db.59temai.com:3306db59store_qa
+java.sql.SQLException: No suitable driver found for jdbc:sqlserver://db.59temai.com:3306db59store_qa
+	at java.sql.DriverManager.getConnection(DriverManager.java:689)
+	at java.sql.DriverManager.getConnection(DriverManager.java:247)
+	at sql.SQLConnect.getConnection(SQLConnect.java:77)
+	at sql.SQLConnect.executeQueryRS(SQLConnect.java:235)
+	at sql.SQLConnect.excuteQuery(SQLConnect.java:258)
+	at com.dorm.test.SQLConnectTest.main(SQLConnectTest.java:114)

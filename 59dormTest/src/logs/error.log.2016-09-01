@@ -1,0 +1,4 @@
+2016-09-01 13:43:20  [ main:1101 ] - [ ERROR ] - [ util.JsonShemaValidator.validatorSchema(JsonShemaValidator.java:45) ] com.fasterxml.jackson.core.JsonParseException: no JSON Text to read from input
+ at [Source: java.io.StringReader@33f676f6; line: 1, column: 1]
+2016-09-01 13:48:41  [ main:2211 ] - [ ERROR ] - [ util.JsonShemaValidator.validatorSchema(JsonShemaValidator.java:44) ] com.fasterxml.jackson.core.JsonParseException: no JSON Text to read from input
+ at [Source: java.io.StringReader@3576ddc2; line: 1, column: 1]
