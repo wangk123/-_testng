@@ -11,8 +11,9 @@ public class ReadJsonFile {
 	 * 读取json文件
 	 * @param name 文件名(文件请到/src/test/resources路径下) 
 	 * @return
+	 * @throws IOException 
 	 */
-	public static String readJsonFile(String name){
+	public static String readJsonFile(String name) throws IOException {
 		
 		    File file = new File("src/test/resources/" + name);
 		    BufferedReader reader = null;
@@ -26,15 +27,14 @@ public class ReadJsonFile {
 		      laststr = laststr + tempString;
 		     }
 		     reader.close();
-		    } catch (IOException e) {
-		     e.printStackTrace();
 		    } finally {
-		     if (reader != null) {
-		      try {
-		       reader.close();
-		      } catch (IOException e1) {
-		      }
-		     }
+			     if (reader != null) {
+				      try {
+				    	  reader.close();
+				      } catch (IOException e1) {
+				    	  e1.printStackTrace();
+				      }
+			     }
 		    }
 		    return laststr;
 		

@@ -1,174 +1,156 @@
 package util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 public class HttpRequest {
 	
 	private static Logger log = Logger.getLogger(HttpRequest.class);
-		
-	/**
-	 * get请求
-	 * @param url 域名
-	 * @param requestPath 请求路径 
-	 * @param parameter 请求参数  key=value&key1=value1
-	 * @return
-	 */
-	public static String get(String url,String requestPath,String parameter){
-		
-		String result = "";
-		
-		CloseableHttpClient httpClient = HttpClients.createDefault();
-		
-		String uri = SpliceURI.sUri(url, requestPath, parameter);
-		
-		try {
-			
-			StringBuilder sb = new StringBuilder(uri);
-			
-			HttpGet httpget = new HttpGet(sb.toString());
-			
-			HttpResponse response = httpClient.execute(httpget);
-			
-			HttpEntity entity = response.getEntity();
-			
-			result = EntityUtils.toString(entity,"utf-8");
-			
-			log.info("接口：" + requestPath + "\n" + "Request: " + sb.toString() + "\n" + "Response: " + result);
-			
-		} catch (ClientProtocolException e) {
-			log.error(e.getMessage(),e);
-		} catch (IOException e) {
-			log.error(e.getMessage(),e);
-		} finally {
-			
-			try {
-				
-				httpClient.close();
-				
-			} catch (IOException e) {
-				
-				log.error(e.getMessage(),e);
-			}
-			
-		}
-		
-		return result;
-		
-	}
 	
 	/**
 	 * post请求
-	 * @param url 域名
-	 * @param requestPath 请求路径
-	 * @param parameter 请求参数
-	 * @return
+	 * @param urlPath 请求路径
+	 * @param params 参数
+	 * @return Map<String, Object>  response、allHeaders[]、protocolVersion、statusCode、reasonPhrase
 	 */
-	public static String post(String url,String requestPath,String parameter){
-		String result = "";
+	public static Map<String, Object> post(String url, Map<String, Object> params){
 		
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		
-		String uri = SpliceURI.sUri(url, requestPath, parameter);
+		HttpPost httpPost = postForm(url, params);
+		
+		Map<String, Object> response = invoke(httpClient, httpPost);
+		
+		httpClient.getConnectionManager().shutdown();
+		
+		return response;
+	}
+	
+	/**
+	 * get请求
+	 * @param urlPath 请求路径
+	 * @param params 参数
+	 * @return Map<String, Object>  response、allHeaders[]、protocolVersion、statusCode、reasonPhrase
+	 */
+	public static Map<String, Object> get(String url, Map<String, Object> params){
+		
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		
+		HttpGet httpGet = new HttpGet(uriForm(url, params));
+		
+		Map<String, Object> response = invoke(httpClient, httpGet);
+		
+		httpClient.getConnectionManager().shutdown();
+		
+		return response;
+	}
+	
+	/**
+	 * put请求
+	 * @param urlPath 请求路径
+	 * @param params 参数
+	 * @return Map<String, Object>  response、allHeaders[]、protocolVersion、statusCode、reasonPhrase
+	 */
+	public static Map<String, Object> put(String url, Map<String, Object> params){
+		
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		
+		HttpPut httpPut = new HttpPut(uriForm(url, params));
+		
+		Map<String, Object> response = invoke(httpClient, httpPut);
+		
+		httpClient.getConnectionManager().shutdown();
+		
+		return response;
+	}
+	
+	private static Map<String, Object> invoke(CloseableHttpClient httpClient, HttpUriRequest request){
+		
+		Map<String, Object> result = null;
 		
 		try {
-			
-			StringBuilder sb = new StringBuilder(uri);
-			
-			HttpPost httpPost = new HttpPost(sb.toString());
-		
-			HttpResponse response = httpClient.execute(httpPost);
-			
-			HttpEntity entity = response.getEntity();
-			
-			result = EntityUtils.toString(entity,"utf-8");
-			
-			log.info("接口：" + requestPath + "\n" + "Request: " + sb.toString() + "\n" + "Response: " + result);
-			
-		} catch (ClientProtocolException e) {
+			HttpResponse httpResponse = httpClient.execute(request);
+			HttpEntity entity = httpResponse.getEntity();
+			result = getAll(httpResponse);
+			String response = EntityUtils.toString(entity, HTTP.UTF_8);
+			result.put("response", response);
+			log.info("Response: " + result.get("response"));
+		} catch (Exception e) {
 			log.error(e.getMessage(),e);
-		} catch (IOException e) {
-			log.error(e.getMessage(),e);
-		} finally {
-			try {
-				httpClient.close();
-			} catch (IOException e) {
-				log.error(e.getMessage(),e);
-			}
 		}
 		
 		return result;
 	}
 	
-	/**
-	 * 向指定 URL 发送GET方法的请求
-	 * @param requestPath  请求路径
-	 * @param parameter  请求参数
-	 * @return Response Result
-	 */
-	public static String sendGet(String URL,String requestPath,String parameter){
+	private static Map<String, Object> getAll(HttpResponse hr) {
 		
-		
-		
-		
-		String result = "";
-		BufferedReader in = null;
-		
-		try {
-			
-			//拼接URL字串
-			String getURL = URL + requestPath + "?" + parameter;
-			
-			URL realUrl = new URL(getURL);
-			
-			URLConnection connection = realUrl.openConnection();
-			
-			connection.connect();
-			
-//			Map<String, List<String>> map = connection.getHeaderFields();
-			
-//			for (String key : map.keySet()) {
-//                System.out.println(key + "--->" + map.get(key));
-//            }
-			
-			in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			
-			String line;
-			
-			while ((line = in.readLine()) != null){
-				result += line;
-			}
-			
-		} catch (Exception e) {
-			System.out.println("发送Get请求出现异常" + e);
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				if(in != null){
-					in.close();
-				}
-			} catch (Exception e2) {
-				// TODO Auto-generated catch block
-				e2.printStackTrace();
-			}
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("allHeaders", hr.getAllHeaders());
+		params.put("protocolVersion", hr.getProtocolVersion());
+		params.put("statusCode", hr.getStatusLine().getStatusCode());
+		params.put("reasonPhrase", hr.getStatusLine().getReasonPhrase());
+		log.info("ResponseStatusInfo: " + hr.getStatusLine().toString());
+		return params;
+	}
+	
+	private static HttpPost postForm(String url, Map<String, Object> params) {
+		HttpPost httpPost = new HttpPost(url);
+		Map<String, Object> map = SignGenerated.signMap(params);
+		httpPost.setEntity(entityForm(map));
+		log.info("Request: " + url + "?" + paramsForm(map));
+		return httpPost;
+	}
+	
+	private static HttpEntity entityForm(Map<String, Object> params){
+		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+		HttpEntity entity = null;
+		for(String key : params.keySet()){
+			nvps.add(new BasicNameValuePair(key, (String) params.get(key)));
 		}
-		
-		return result;
-		
+		try {
+			entity = new UrlEncodedFormEntity(nvps, HTTP.UTF_8);
+		} catch (Exception e) {
+			log.error(e.getMessage(),e);
+		}
+		return entity;
+	}
+	
+	private static String uriForm(String url, Map<String, Object> params){
+		String uri = null;
+		try {
+			uri = url + "?" + paramsForm(SignGenerated.signMap(params));
+		} catch (Exception e) {
+			log.error(e.getMessage(),e);
+		} 
+		log.info("Request: " + uri);
+		return uri;
+	}
+	
+	private static String paramsForm(Map<String, Object> params) {
+		String str = "";
+		try {
+			str = EntityUtils.toString(entityForm(params));
+		} catch (Exception e) {
+			log.error(e.getMessage(),e);
+		}
+		return str;
 	}
 	
 }

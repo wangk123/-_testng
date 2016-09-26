@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "integer"
+    },
+    "msg": {
+      "type": "string"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "integer"
+        },
+        "uname": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "portrait": {
+          "type": "string"
+        },
+        "role": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "uid",
+        "uname",
+        "phone",
+        "portrait",
+        "role"
+      ]
+    },
+    "token": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "msg",
+    "data",
+    "token"
+  ]
+}

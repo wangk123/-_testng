@@ -1,12 +1,14 @@
 package util;
 
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jackson.JsonLoader;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
+
 
 public class JsonShemaValidator {
 	
@@ -19,23 +21,23 @@ public class JsonShemaValidator {
      * @param fileName http://jsonschema.net/#/转换后数据结构存放文件
      * @param instance json字符串
      */
-    public static void validatorSchema(String fileName, String instance) {
+    public static boolean validatorSchema(String fileName, JSONObject instance) {
         ProcessingReport processingReport = null;
 		try {
 			JsonNode mainNode = JsonLoader.fromString(ReadJsonFile.readJsonFile(fileName));
-			JsonNode instanceNode = JsonLoader.fromString(instance);
+			JsonNode instanceNode = JsonLoader.fromString(instance.toString());
 	        JsonSchema schema = factory.getJsonSchema(mainNode);
 	        processingReport = schema.validate(instanceNode);
 	        if(processingReport.isSuccess() == false){
 	        	//数据结构验证不通过，设置断言结果为false
-	        	Assertion.flag = false;
+	        	return false;
 	        }
-	        log.info(instance + "\n 执行结果：" + processingReport);
+	        log.info("\n 执行结果：" + processingReport);
 		} catch (Exception e) {
-			Assertion.flag = false;
-			log.error(e.getMessage(),e);
-		} 
-		
+			log.error(e.getMessage(), e);
+			return false;
+		}
+		return true; 
     }
 
 }

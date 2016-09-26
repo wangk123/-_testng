@@ -1,9 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="Suite">
-  <test name="Test" verbose="1">
-    <classes>
-      <class name="com.dorm.test.AppTest"/>
-    </classes>
-  </test> <!-- Test -->
+  <test name="loginSuccess">
+      <groups>
+          <run>
+              <include name="loginSuccess"></include>
+          </run>
+      </groups>
+      <classes>
+	      <class name="test.Login"/>
+	  </classes>
+  </test>
+  <test name="loginFiled" verbose="1">
+      <groups>
+          <run>
+              <include name="loginError"></include>
+          </run>
+      </groups>  
+	  <classes>
+	      <class name="test.Login"/>
+	  </classes>
+  </test>
+  <listeners>
+	  <listener class-name="org.uncommons.reportng.HTMLReporter"/>
+	  <listener class-name="org.uncommons.reportng.JUnitXMLReporter"/>
+  </listeners>
 </suite> <!-- Suite -->

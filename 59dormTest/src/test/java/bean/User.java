@@ -20,8 +20,7 @@ public class User {
 	/**
 	 * 设备token
 	 */
-	private static final String DEVICE_TOKEN = "avv7cNRSKWC9ngNFjExUZyR5WGMYFZ5k"
-			+ "MMokQjKQTO1Wv7pAg24Ls3QC02DG+cNS8ZQ/zAXLdv0NUC04Jsy1gKtzk22hQ0cZPUjs/Wijjug=";
+	private static final String DEVICE_TOKEN = "IT7mAo4h5RrgRHTkVoJ4xSmXp8wEDWzI//SYSO9h0K0=";
 
 	public static String getUsername() {
 		return username;
